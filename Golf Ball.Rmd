@@ -1,0 +1,169 @@
+---
+title: "Golf Balls"
+author: "Souradeep Mondal"
+date: "02/08/2020"
+output:
+  word_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Case Study: Par Inc.
+Par Inc., is a major manufacturer of golf equipment. Management believes that Par’s market share could be increasedwith the introduction of a cut-resistant, longer-lasting golf ball. Therefore, the research group at Par has been investigating a new golf ball coating designed to resist cuts and provide a more durable ball. The tests with the coating have been promising. One of the researchers voiced concern about the effect of the new coating on driving distances. Par would like the new cut-resistant ball to offer driving distances comparable to those of the current-model golf ball. To compare the driving distances for the two balls, 40 balls of both the new and current models were subjected to distance tests. The testing was performed with a mechanical hitting machine so that any difference between the mean distances for the two models could be attributed to a difference in the design.
+The results of the tests, with distances measured to the nearest yard, are contained in the data set “Golf”. Prepare a Managerial Report
+
+```{r}
+Golf<-read.csv("Golf.csv", header = TRUE)
+Golf
+```
+
+## Let us take a look at the dataset closely
+
+```{r}
+attach(Golf)
+dim(Golf)
+summary(Golf)
+```
+
+## Preliminary Analysis
+  > Sample Size: 40, Number of Samples = 2
+  > Measurement repeated on Current Golf Balls and New Cut-Resistant Golf Balls
+  > Observations:
+     > Both the samples seems to be normally distributed
+     > Mean and Median values are not that much different
+     > The Current Golf balls data are seems to be left skewed whereas sample of the New Golf balls are               normally distributed
+     
+     
+## Lets perform few statistical measures
+     
+```{r}
+## Standard Deviation
+sd(Current)
+sd(New)
+```
+
+```{r}
+## Variance
+var(Current)
+var(New)
+```
+
+```{r}
+## Inter Quartile Range
+IQR(Current)
+IQR(New)
+```
+
+```{r}
+## Standard Error
+n = 40
+CurrentSE = (sd(Current)/sqrt(n))
+CurrentSE
+
+NewSE = (sd(New)/sqrt(n))
+NewSE
+```
+
+## Data Visualization
+
+## Histograms
+```{r}
+hist(Current, col ="#c00000", main = "Current Golf Balls")
+hist(New, col ="coral", main = "New Golf Balls")
+```
+
+## Boxplots
+```{r}
+boxplot(Current,col="#c00000",horizontal =TRUE, main="Current Golf Balls")
+boxplot(New,col="coral",horizontal =TRUE, main="New Golf Balls")
+```
+## Hypothesis Testing
+Number of samples = 2
+Both of the samples are Independent samples
+Sample Size, N =40
+Level of Significance (Alpha) = 0.05
+Since Both the Population Standard Deviation (Sigma) is unknown, but the populations are normally distributed we have to use a 2 Sample t-test
+Mean distance of current-model balls:𝜇current.
+Mean distance of new cut-resistant balls:𝜇new
+
+## Hypothesis Formulation 
+NULL HYPOTHESIS  
+H0:𝜇current =𝜇new(Mean distance of current balls equals mean distance of new balls)
+
+ALTERNATIVE HYPOTHESIS
+H1:𝜇current ≠ 𝜇new(Mean distance of current balls is not equal mean distance of new balls)
+
+The ≠ sign in the alternative hypothesis indicates that the test is two-tailed
+
+To further test our hypothesis, we have set α at 0.05 and our rejection criteria is to Reject the Null Hypothesis and accept the Alternative Hypothesis i.e. to prove that there is actually a change in the mean distances for the two models could be attributed to a difference in the design
+
+```{r}
+CI=t.test(Current,New,conf.level =0.95)
+CI
+```
+Degrees of freedom = 76.852
+t = 1.3284
+p-value = 0.188
+
+Looking at the descriptive statistics for each samples, we can say that Current Golf balls has a longer range of distance based on the 40 samples with a mean of 270.3 compared to 267.5 for the New Golf balls. The standard deviation of the Current Golf balls is 8.75 and as for the New Golf balls it is 9.89. The mean differences between distances in Current and New golf balls is 2.775(270.3 - 267.5), not showing a significant difference to prove that there is a relevant change between the Current and the New Golf balls. Inter Quartile Ranges(IQR) of both the samples are hardly any different from each other to suggest that there is any significant change.
+
+P-value=0.188>0.05=α. 
+This suggests the following:
+  Failed to reject the null hypothesis i.e. H0
+  Mean distance of the New cut-resistant Golf balls equalsmean distance of Current model Golf balls
+  The new cut-resistant balls have no significant difference in distance compared to the Current model Golf     balls
+  
+Thus, it can be recommended for Par Inc. to launch the New cut-resistant Golf balls as it is not impacting the distance aspect as suggested.  
+
+```{r}
+## For Current Golf ballat 95% confidence interval
+CICurrent=t.test(Current)
+CICurrent
+
+## For New cut-resistantGolf ballat 95% confidence interval
+CINew=t.test(New)
+CINew
+```
+
+Just by understanding from the confidence intervals of the 2 samples, it can be said that there is no significant difference between the driving distances of the Current and the New Golf balls.
+
+
+
+## Is there a need of larger sample sizes and more testing with the golf balls?
+
+P-valuefor this two-tailed test is 0.188, which is greater than level of significance i.e. α=0.05. Hence, H0 will not be rejected which shows that Par Inc. should take a new ball in production as the P-value indicates that there is no significant difference between estimated population mean of current golf ball as well as new golf ball.The 95% confidence interval for the population mean of the current golf ball is 267.4757to 273.0743 and of the model is 264.3348 to 270.6652.It means that the estimated population mean for Par, Inc. should lie within this range for consistent result. However, the 95% confidence interval for the difference between the means of the two populations is 2.775.
+
+```{r}
+#Power of test for sample size calculation
+diff1=Current-New
+diff1
+
+detect=mean(diff1)
+detect
+
+sddiff=sd(diff1)
+sddiff
+
+cohen.d=detect/sddiff
+cohen.d
+
+powertest=power.t.test(n=40,d=cohen.d,sig.level =0.05,power =NULL,alternative ="two.sided")
+powertest
+
+powertestA=power.t.test(n=NULL,d=cohen.d,sig.level =0.05,power=0.95,alternative ="two.sided")
+powertestA
+
+powertestB=power.t.test(n=NULL,d=cohen.d,sig.level =0.05,power=0.90,alternative ="two.sided")
+powertestB
+
+```
+Power of test for the sample is 0.14274, which is significantly low for the sample size (n) of 40.Ideally, the Power should be around 0.90 to 0.95 for the sample size.The low power value suggests that the sample size of 40 is too small for this hypothesis testing. Thus, a bigger number sample size is required.
+
+By, the above two data we can say that the present sample size not at all appropriate to prove the hypothesis.
+
+
+#Conclusion
+From the given data, it may be concluded that, statistically there is no significant increase/decrease in distance because of the new cut-resistant golf ball. However, our recommendation is that the test be carried out with a larger sample size to improve the accuracy of test result. Other than testing only the driving distance, Par Inc. should also consider other factors like costing, availability of suppliers and the like before finalizing and launching the product if they are looking to test a larger sample size.
